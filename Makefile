@@ -37,10 +37,12 @@ audit:
 	if git status --short --untracked-files=all | grep -q '^??'; then \
 		echo "audit FAILED: untracked files present" >&2; exit 1; fi; \
 	echo "# audit 4/6: check-ignore effectiveness"; \
-	mkdir -p data/audit_probe_tmp; \
-	trap 'rm -rf data/audit_probe_tmp' EXIT; \
+	mkdir -p data/audit_probe_tmp result/audit_probe_tmp; \
+	trap 'rm -rf data/audit_probe_tmp result/audit_probe_tmp' EXIT; \
 	git check-ignore -q data/audit_probe_tmp || { \
 		echo "audit FAILED: data output dirs are not ignored" >&2; exit 1; }; \
+	git check-ignore -q result/audit_probe_tmp || { \
+		echo "audit FAILED: result/ is not ignored" >&2; exit 1; }; \
 	if git check-ignore -q data/prompts.json; then \
 		echo "audit FAILED: data/prompts.json must NOT be ignored" >&2; exit 1; fi; \
 	echo "# audit 5/6: forbidden-term scan (scripts/*.py data/prompts*.json README.md)"; \

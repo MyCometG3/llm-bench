@@ -18,7 +18,8 @@ If any setup step (model status, unload, reload, availability wait, load,
 warmup) fails, the condition's rows are recorded with status "error"
 and no HTTP measurement request is sent for that condition.
 
-Output files under ./data/<stamp>/ (one set per run, named <kind>_<stamp>.*):
+Output files under ./result/<stamp>/ (prompts stay under ./data/; one set per
+run, named <kind>_<stamp>.*):
   manifest_<stamp>.json  experiment config + script/prompts hashes
                          (--resume verifies this before appending)
   rows_<stamp>.jsonl     one record per ATTEMPTED request (errors included);
@@ -108,7 +109,8 @@ from pathlib import Path
 
 DEFAULT_BASE_URL = "http://127.0.0.1:8000"
 HERE = Path(__file__).resolve().parent
-DATA_DIR = HERE.parent / "data"
+DATA_DIR = HERE.parent / "data"      # git-tracked prompts (read-only in normal use)
+RESULT_DIR = HERE.parent / "result"  # run outputs (git-ignored, auto-created)
 PROMPTS_FILE = DATA_DIR / "prompts.json"
 DEFAULT_SETTINGS_PATH = Path.home() / ".omlx" / "model_settings.json"
 
@@ -1021,16 +1023,18 @@ def annotate_rows(rows: list[dict], max_tokens: object = None) -> list[dict]:
     return [annotate_row(r, max_tokens) for r in rows]
 
 
-def result_files(data_dir: Path) -> list[Path]:
+def result_files(result_dir: Path) -> list[Path]:
     """Return result JSONL files ordered by experiment timestamp.
 
-    New runs are stored below ``data/<timestamp>/``. Direct ``data/rows_*.jsonl``
-    files are retained here for backward-compatible resume support. Only
-    timestamp-named directories are searched, so chart and other helper
-    directories are not mistaken for benchmark runs.
+    New runs are stored below ``result/<timestamp>/``. Direct
+    ``result/rows_*.jsonl`` files are retained here for backward-compatible
+    resume support. Only timestamp-named directories are searched, so chart
+    and other helper directories are not mistaken for benchmark runs.
     """
-    paths = list(data_dir.glob("rows_*.jsonl"))
-    for directory in data_dir.iterdir():
+    if not result_dir.exists():
+        return []
+    paths = list(result_dir.glob("rows_*.jsonl"))
+    for directory in result_dir.iterdir():
         if not directory.is_dir():
             continue
         try:
@@ -1040,7 +1044,7 @@ def result_files(data_dir: Path) -> list[Path]:
         paths.extend(directory.glob("rows_*.jsonl"))
 
     def experiment_stamp(path: Path) -> str:
-        if path.parent == data_dir:
+        if path.parent == result_dir:
             return path.stem.removeprefix("rows_")
         return path.parent.name
 
@@ -1834,7 +1838,7 @@ def resummarize_results(rows_arg: str | None) -> int:
     """Regenerate summary_<stamp>.md / rows_<stamp>.csv from an existing rows
     JSONL without any HTTP call or measurement (--resummarize).
 
-    With no path, the newest data/rows_*.jsonl is used. The adjacent manifest
+    With no path, the newest result/rows_*.jsonl is used. The adjacent manifest
     supplies the experiment config for the header (missing manifest -> "?" in
     the header). Existing summary/csv artifacts in the same directory are
     overwritten with the regenerated ones."""
@@ -1844,9 +1848,9 @@ def resummarize_results(rows_arg: str | None) -> int:
             print(f"error: rows file not found: {results_path}", file=sys.stderr)
             return 2
     else:
-        candidates = result_files(DATA_DIR)
+        candidates = result_files(RESULT_DIR)
         if not candidates:
-            print("error: no rows_*.jsonl found under data/", file=sys.stderr)
+            print("error: no rows_*.jsonl found under result/", file=sys.stderr)
             return 2
         results_path = candidates[-1]
     stamp = results_path.stem.removeprefix("rows_")
@@ -2415,8 +2419,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     ap.add_argument(
         "--resume",
         action="store_true",
-        help="append to the newest data/<timestamp>/rows_*.jsonl after verifying "
-        "manifest; also supports legacy data/rows_*.jsonl; skip done "
+        help="append to the newest result/<timestamp>/rows_*.jsonl after verifying "
+        "manifest; also supports legacy result/rows_*.jsonl; skip done "
         "(status=ok) condition+prompt+run keys",
     )
     ap.add_argument(
@@ -2427,7 +2431,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         metavar="ROWS_JSONL",
         help="regenerate summary_<stamp>.md and rows_<stamp>.csv from an existing "
         "rows JSONL without any measurement (no value: use the newest "
-        "data/rows_*.jsonl)",
+        "result/rows_*.jsonl)",
     )
     return ap
 
@@ -2806,14 +2810,14 @@ def row_key(
 
 def resolve_output_paths(args: argparse.Namespace) -> OutputPaths:
     """Create/pick the output directory and artifact paths. With --resume the
-    newest existing rows_*.jsonl (data/<timestamp>/ first, then legacy
-    data/) is selected and its stamp/directory reused."""
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    newest existing rows_*.jsonl (result/<timestamp>/ first, then legacy
+    result/) is selected and its stamp/directory reused."""
+    RESULT_DIR.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = DATA_DIR / stamp
+    output_dir = RESULT_DIR / stamp
     results_path = output_dir / f"rows_{stamp}.jsonl"
     if args.resume:
-        prev = result_files(DATA_DIR)
+        prev = result_files(RESULT_DIR)
         if prev:
             results_path = prev[-1]
             output_dir = results_path.parent

@@ -81,7 +81,7 @@ requests isolated from the in-server load cost.
 | `python3 scripts/run_bench.py --dry-run` | 0 (prints the condition matrix) |
 | Minimal run: `python3 scripts/run_bench.py --no-unload --models Qwen3.8-27B-oQ4e-mtp --thinking on --efforts medium --runs 1` | **1 condition × 3 prompts = 3 requests** (no warmup under `--no-unload`) |
 | Default matrix (1 model, no budgets, runs=3) | 4 conditions × 3 prompts × 3 runs = **36 measurement requests**; full mode adds one warmup per condition (+4) and a load cycle. On the pinned Qwen repo the `high` row may error/degrade depending on the engine build (see Effort contract above) |
-| Charts: `uv run --with matplotlib python3 scripts/plot_summary_charts.py data/<ts>/summary_<ts>.md data/<ts>/charts` (add `--per-model` for per-model panels) | — |
+| Charts: `uv run --with matplotlib python3 scripts/plot_summary_charts.py result/<ts>/summary_<ts>.md result/<ts>/charts` (add `--per-model` for per-model panels) | — |
 
 Note: `--thinking off` alone auto-appends an ON × effort=`off` alias-probe
 condition, so it runs **2 conditions** (6 requests per run). The minimal run
@@ -107,12 +107,14 @@ above uses `--thinking on --efforts medium` to pin exactly one condition.
 | `--base-url URL` | server base URL (default: `$OMLX_BASE_URL` or `http://127.0.0.1:8000`) |
 | `--dry-run` | print the condition matrix and exit |
 | `--check-env` | read-only preflight probe; prints an environment report and exits (0 base API usable, 1 unreachable, 3 unusable; **chat capability is NOT verified**) |
-| `--resume` | append to the newest `data/<timestamp>/rows_*.jsonl` after verifying the manifest; skips done rows |
+| `--resume` | append to the newest `result/<timestamp>/rows_*.jsonl` after verifying the manifest; skips done rows |
 | `--resummarize [ROWS_JSONL]` | regenerate summary/csv from an existing rows file without measuring |
 
 ## Output format
 
-One run writes everything under `data/<YYYYMMDD_HHMMSS>/`:
+One run writes everything under `result/<YYYYMMDD_HHMMSS>/` (created
+automatically; git-ignored). Prompt files stay under `data/` (git-tracked) —
+the two directories are independent:
 
 - `rows_<stamp>.jsonl` — one JSON object per request: model, condition
   (thinking/effort/budget), prompt id, run, timings, token usage, and the

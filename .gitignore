@@ -1,7 +1,9 @@
-# Runtime outputs land in data/<YYYYMMDD_HHMMSS>/ and are never published.
-# NOTE: the negation lines below re-include the published prompt files
+# Run outputs land in result/<YYYYMMDD_HHMMSS>/ and are never published.
+# Prompt files stay in data/ (git-tracked); the data/* + negation lines below
+# are kept as a safety net against accidental writes there -- negation works
 # because the pattern excludes the CONTENTS of data/ (data/*), not the
 # data/ directory itself -- an ignored directory cannot be negated into.
+result/
 data/*
 !data/prompts.json
 !data/prompts.arith.deep.json
