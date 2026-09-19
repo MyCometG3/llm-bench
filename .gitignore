@@ -1,0 +1,15 @@
+# Runtime outputs land in data/<YYYYMMDD_HHMMSS>/ and are never published.
+# NOTE: the negation lines below re-include the published prompt files
+# because the pattern excludes the CONTENTS of data/ (data/*), not the
+# data/ directory itself -- an ignored directory cannot be negated into.
+data/*
+!data/prompts.json
+!data/prompts.arith.deep.json
+!data/prompts.math.deep.json
+!data/prompts.words.deep.json
+
+# local debris / scratch
+.DS_Store
+__pycache__/
+*.pyc
+.audit.*

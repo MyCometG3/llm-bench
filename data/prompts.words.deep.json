@@ -1,0 +1,21 @@
+{
+  "description": "Deep word-problem prompts (~2x reasoning vs prompt2_words). Each requires elapsed-time bookkeeping or rate synchronization across multiple phases.",
+  "max_tokens": 6000,
+  "prompts": [
+    {
+      "id": "prompt5a_words_train_meet",
+      "content": "Train A leaves Tokyo for Osaka (233 km) at 10:00 AM, traveling at 100 km/h nonstop. Train B leaves Osaka for Tokyo at 10:05 AM, traveling at 80 km/h, and makes a 10-minute stop exactly at the midpoint (116.5 km from each end). First compute Train A's distance from Tokyo as a function of elapsed minutes after 10:00 AM, then work out Train B's schedule: it travels the first 116.5 km (from Osaka), pauses 10 minutes, and continues the second half. Determine (a) the clock time at which the two trains pass each other, and (b) the distance of that passing point from Tokyo in km. Show the elapsed-time bookkeeping for each train and explain whether the meeting happens before or after Train B's stop, then give the passing clock time and the passing distance from Tokyo on the last line.",
+      "check": "Pass at ~11:20 AM (79.9 min after 10:00, 719/540 h), about 133.15 km from Tokyo; meeting occurs before Train B's midpoint stop"
+    },
+    {
+      "id": "prompt5b_words_work_rate_break",
+      "content": "Worker A can complete a job alone in 6 hours, Worker B in 9 hours. They start at 8:00 AM. Worker A works alone for 1.5 hours, then both work together for 1 hour. Worker B then takes a 20-minute break while Worker A continues alone, after which both resume together until the job is finished. Compute the fraction of work done in each phase in order: A alone, first joint period, B's break (A alone), and final joint period. Show the remaining fraction before the final period and the duration of the final period, then give the clock time when the job finishes and the total elapsed time as the last line.",
+      "check": "Phases: 0.25 + 0.2778 + 0.0556 + 0.4167 = 1.0; final joint 1.5 h; total 4.333 h (4h20m); finishes at 12:20 PM"
+    },
+    {
+      "id": "prompt5c_words_varying_speed",
+      "content": "A car leaves at 8:00 AM and must cover 260 km in three legs: 120 km at 60 km/h, then 80 km at 80 km/h, with a 15-minute refueling stop between the second and third legs, then 60 km at 100 km/h. Compute the driving time for each leg and the stop separately, then the total elapsed time including the stop and the clock time of arrival. Also compute the average speed excluding the stop (total distance divided by total driving time only). Show each leg's time, the stop, the totals, and give the arrival clock time and the driving-only average speed as the last line.",
+      "check": "Legs: 2.00h + 1.00h + 0.25h stop + 0.60h = 3.85h total (3h51m); arrival 11:51 AM; driving-only avg 260/3.6 = 72.22 km/h"
+    }
+  ]
+}

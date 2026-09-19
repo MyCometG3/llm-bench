@@ -1,0 +1,21 @@
+{
+  "description": "Benchmark prompts. Each prompt becomes one benchmark row per (model, thinking, effort, run). 'check' values are hand-derived spot-checks, NOT a formal answer key: summary Table 5 runs an automated heuristic contains-check on them (the check's last number appearing in the delivered answer), which is a tally, not a verification. Rows that never delivered an answer are excluded from that tally. These variants (~2x reasoning depth vs the original arithmetic/word-problem/combinatorics) require multi-step, chained reasoning. Answers shown are hand-derived spot-checks; do not assume they are error-free — recompute before use. prompt5/prompt6 check values corrected on 2026-09-05 (passing time ~11:20 AM; Total = 38).",
+  "max_tokens": 10000,
+  "prompts": [
+    {
+      "id": "prompt4_arithmetic_deep",
+      "content": "A savings account opens with 100,000 yen. At the end of each calendar year, the balance grows by 3% from interest and then a 10% tax is deducted from that year's interest only. In addition, exactly 5,000 yen is withdrawn at the end of each year (after the interest and tax are settled). Calculate the balance at the end of year 1, then year 2, then year 3, applying each step (interest -> tax -> withdrawal) in order for every year. Show the balance at the end of each of the three years, and give the final end-of-year-3 balance as the last line by itself. Round to the nearest yen.",
+      "check": "Y1=97,700; Y2=95,338; Y3=92,912 (final 92,912 yen)"
+    },
+    {
+      "id": "prompt5_words_deep",
+      "content": "Train A leaves Tokyo for Osaka (233 km) at 10:00 AM, traveling at 100 km/h nonstop. Train B leaves Osaka for Tokyo at 10:05 AM, traveling at 80 km/h, and makes a 10-minute stop exactly at the midpoint (116.5 km from each end). First compute Train A's distance from Tokyo as a function of elapsed minutes after 10:00 AM, then work out Train B's schedule: it travels the first 116.5 km (from Osaka), pauses 10 minutes, and continues the second half. Determine (a) the clock time at which the two trains pass each other, and (b) the distance of that passing point from Tokyo in km. Show the elapsed-time bookkeeping for each train and explain whether the meeting happens before or after Train B's stop, then give the passing clock time and the passing distance from Tokyo on the last line.",
+      "check": "Pass at ~11:20 AM, about 133.15 km from Tokyo"
+    },
+    {
+      "id": "prompt6_math_deep",
+      "content": "How many distinct 4-letter arrangements can be formed using the letters of the word 'BANANA' (which has 3 A's, 2 N's, and 1 B), if each arrangement must use exactly 4 letters and cannot use a letter more times than it appears in 'BANANA'? Count by cases according to the letter-frequency pattern of the arrangement (for example: 3 A's + 1 other, 2 A's + 2 N's, 2 A's + 1 N + 1 B, etc.), compute the number of distinct arrangements in each case, sum the cases, and give the total. Show the case breakdown and each case's count, then give the total on the last line by itself.",
+      "check": "Total = 38"
+    }
+  ]
+}

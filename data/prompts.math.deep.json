@@ -1,0 +1,21 @@
+{
+  "description": "Deep combinatorics prompts (~2x reasoning vs prompt3_math). Each requires case enumeration with inclusion-exclusion or probability summation.",
+  "max_tokens": 6000,
+  "prompts": [
+    {
+      "id": "prompt6a_math_banana_arrangements",
+      "content": "How many distinct 4-letter arrangements can be formed using the letters of the word 'BANANA' (which has 3 A's, 2 N's, and 1 B), if each arrangement must use exactly 4 letters and cannot use a letter more times than it appears in 'BANANA'? Count by cases according to the letter-frequency pattern of the arrangement (for example: 3 A's + 1 other, 2 A's + 2 N's, 2 A's + 1 N + 1 B, etc.), compute the number of distinct arrangements in each case, sum the cases, and give the total. Show the case breakdown and each case's count, then give the total on the last line by itself.",
+      "check": "Patterns (A,N,B): (1,2,1)=12 + (2,1,1)=12 + (2,2,0)=6 + (3,0,1)=4 + (3,1,0)=4 => total 38"
+    },
+    {
+      "id": "prompt6b_math_urn_probability",
+      "content": "An urn contains 12 balls: 5 red, 4 blue, and 3 green. Three balls are drawn uniformly at random without replacement. What is the probability that at least two of the three drawn balls share the same color? Enumerate the favorable cases (exactly two of a color plus one of another color, and all three of the same color) for each color, compute the count for each case as C(n,2)*C(remaining,1) or C(n,3), sum them, divide by C(12,3), and give the simplified fraction and decimal. Show every case's count, the sum, and give the final probability as the last line.",
+      "check": "Total C(12,3)=220; fav = R:10*7+10 + B:6*8+4 + G:3*9+1 =80+52+28=160; prob=160/220=8/11≈0.7273"
+    },
+    {
+      "id": "prompt6c_math_boxes_constrained",
+      "content": "Five distinct balls are placed into 3 labeled boxes (Box 1, Box 2, Box 3). Count the assignments where every box contains at least one ball AND Box 1 contains at least two balls. First compute the total number of onto assignments (every box non-empty) using inclusion-exclusion, then subtract the assignments where Box 1 has exactly one ball (choose the ball for Box 1, then distribute the remaining 4 balls onto Boxes 2 and 3 with each non-empty). Show both counts and the subtraction, then give the final count as the last line by itself.",
+      "check": "Onto total 3^5-3*2^5+3=150; Box1=1 with others non-empty: C(5,1)*(2^4-2)=5*14=70; result 150-70=80"
+    }
+  ]
+}

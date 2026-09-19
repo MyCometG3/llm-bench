@@ -1,0 +1,21 @@
+{
+  "description": "Deep arithmetic prompts (~2x reasoning vs prompt1_arithmetic). Each requires multi-step chained calculations with intermediate rounding. max_tokens 6000 to avoid truncation on thinking=on.",
+  "max_tokens": 6000,
+  "prompts": [
+    {
+      "id": "prompt4a_arith_compound",
+      "content": "A savings account opens with 100,000 yen. At the end of each calendar year, the balance grows by 3% from interest and then a 10% tax is deducted from that year's interest only. In addition, exactly 5,000 yen is withdrawn at the end of each year (after the interest and tax are settled). Calculate the balance at the end of year 1, then year 2, then year 3, applying each step (interest -> tax -> withdrawal) in order for every year. Show the balance at the end of each of the three years, and give the final end-of-year-3 balance as the last line by itself. Round to the nearest yen at each year-end.",
+      "check": "Y1=97,700; Y2=95,338; Y3=92,912 (final 92,912 yen)"
+    },
+    {
+      "id": "prompt4b_arith_discount_chain",
+      "content": "An item is priced at 12,800 yen (tax-exclusive). First apply a 15% discount, then apply an additional 20% discount on the discounted price. Next add a flat shipping fee of 600 yen, and finally apply 10% consumption tax on the subtotal (discounted price + shipping). Compute each intermediate result in order: price after 15% off, price after the additional 20% off, subtotal after shipping, and final tax-included total. Show all four values with the calculation for each step, and give the final total as the last line by itself.",
+      "check": "10880 -> 8704 -> 9304 -> 10234.4 (final 10,234 yen, 10234.4 exact)"
+    },
+    {
+      "id": "prompt4c_arith_fx_batch",
+      "content": "You buy 6 identical items, each costing 2,400 yen, so the total in yen is 6 * 2,400. Convert the total to euros at the rate of 160 yen per euro, then add a 2% conversion fee on the euro amount, and finally add a 22.8% import duty on the fee-included amount. Compute each step in order: total yen, euros before fee, euros after 2% fee, and final euros after duty. Round the final result to two decimal places, show every intermediate value, and give the final euro amount as the last line by itself.",
+      "check": "14400 yen -> 90.00 EUR -> 91.80 EUR -> 112.73 EUR (112.7304 exact, 112.73 rounded)"
+    }
+  ]
+}
