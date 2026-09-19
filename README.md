@@ -33,6 +33,14 @@ Alternative repos exist (e.g. `mlx-works/Ornith-1.5-35B-A3B-oQ4e-mtp`,
 `LookUpMark/Ornith-1.5-35B-A3B-oQ4e-mtp`) but are separate builds; do not mix
 builds within one measurement series.
 
+**Local-quantization id collision**: oMLX displays model ids without the org
+prefix, so a locally quantized copy of the base model can shadow a pinned HF
+repo under the same id (e.g. `Qwen/Qwen3.8-27B-oQ4e-mtp` and
+`Jundot/Qwen3.8-27B-oQ4e-mtp` both surface as `Qwen3.8-27B-oQ4e-mtp`). A
+local quantization is a **different weight set** from the pinned repo —
+make sure the server serves the pinned repo when reproducing published
+numbers.
+
 **Effort contract for the pinned Qwen template**: the template accepts
 `xhigh` / `medium` / `low` (its built-in default when unspecified is
 `xhigh`). The CLI default matrix instead runs `low medium high`
