@@ -343,12 +343,17 @@ def load_model(
     raise RuntimeError("unreachable")
 
 
-def unload_model(m: str, logger: LoadLogger) -> None:
+def unload_model(m: str, logger: LoadLogger, wait_timeout: float = 120.0) -> None:
     """Unload one physical model ID.
 
-    A 200 response means the model was unloaded and a 400 response means it
-    was already unloaded. Any other status raises because isolation would be
-    broken and the caller must fail the condition instead of measuring.
+    A 200 response means the model was unloaded synchronously and a 400
+    response means it was already unloaded. oMLX >= 0.7.1dev1 also answers
+    202 with {"status": "unloading"}: the unload was ACCEPTED and runs in
+    the background (active requests are aborted first), so poll
+    /v1/models/status until the model leaves the loaded set, mirroring the
+    reload_wait pattern (logged as an unload_wait event). Any other status
+    raises because isolation would be broken and the caller must fail the
+    condition instead of measuring.
     """
     t0 = time.perf_counter()
     status, body = http_json(
@@ -356,6 +361,29 @@ def unload_model(m: str, logger: LoadLogger) -> None:
     )
     wall = time.perf_counter() - t0
     logger.log(m, "unload", status, body, wall)
+    if status == 202:
+        t_wait = time.perf_counter()
+        deadline = time.time() + wait_timeout
+        while time.time() < deadline:
+            try:
+                loaded = m in loaded_models()
+            except RuntimeError:
+                loaded = True  # status endpoint hiccup: keep waiting
+            if not loaded:
+                break
+            time.sleep(0.5)
+        else:
+            raise RuntimeError(
+                f"unload {m} failed: still unloading after {wait_timeout}s"
+            )
+        logger.log(
+            m,
+            "unload_wait",
+            200,
+            {"unloaded": True},
+            time.perf_counter() - t_wait,
+        )
+        return
     if status not in (200, 400):
         raise RuntimeError(f"unload {m} failed: status={status} body={body}")
 

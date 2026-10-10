@@ -5,7 +5,7 @@ behavior of reasoning LLMs served through an oMLX-compatible API: request
 latency, token throughput, thinking/output split, budget-binding effectiveness,
 and self-check answer accuracy.
 
-**Tested with oMLX 0.7.0.dev2 (development build).** Stable releases may not
+**Tested with oMLX 0.7.1dev1 (development build).** Stable releases may not
 expose the admin endpoints; run `--check-env` first and fall back to
 `--no-unload` if the status endpoint is missing.
 
@@ -71,7 +71,11 @@ the features above; verify behavior on your server with a minimal run —
 
 **Secondary: full mode** (default) — oMLX-managed load cycle. Per condition:
 unload → reload (optional, `--reload`) → load → warmup, keeping the measured
-requests isolated from the in-server load cost.
+requests isolated from the in-server load cost. oMLX ≥ 0.7.1dev1 may answer
+unload with 202 (accepted, unloading in the background): the runner polls
+`/v1/models/status` until the model is unloaded, logged as an `unload_wait`
+event (120 s timeout; a timeout fails the condition). 200/400 finish
+immediately.
 
 ## Quickstart
 
@@ -122,7 +126,7 @@ the two directories are independent:
 - `rows_<stamp>.csv` — flattened view with derived columns
 - `summary_<stamp>.md` — human-readable tables (aggregate metrics; Table 3/4
   analyze how budgets bind measured behavior)
-- `load_log_<stamp>.tsv` — unload/load/reload events (full mode)
+- `load_log_<stamp>.tsv` — unload/`unload_wait`/reload/`reload_wait`/load events (full mode)
 - `manifest_<stamp>.json` — run configuration plus `script_sha256` /
   `prompts_sha256` for reproducibility
 - `<model>.setting.json` — dump of each model's server-side settings
